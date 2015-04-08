@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifWriter", "ExifWriter.Application\ExifWriter.csproj", "{FD5668B8-8AFA-40AC-ABCA-F04FB43B862C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Commands", "Commands\Commands.csproj", "{511EE213-9EAD-43F2-98C8-56C4B2461849}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{22BFA538-3C6C-48C9-8292-219E50318272}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{B6791AEF-456D-40A8-BAD3-5A6D0694A34B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicesUnitTest", "ServicesUnitTest\ServicesUnitTest.csproj", "{B540ED67-4833-40EA-9B66-C73FB230F4AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExifWriter.Model", "ExifWriter.Model\ExifWriter.Model.csproj", "{2AB23423-B3BD-408A-B4AB-600AEEDA7F0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FD5668B8-8AFA-40AC-ABCA-F04FB43B862C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD5668B8-8AFA-40AC-ABCA-F04FB43B862C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD5668B8-8AFA-40AC-ABCA-F04FB43B862C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD5668B8-8AFA-40AC-ABCA-F04FB43B862C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{511EE213-9EAD-43F2-98C8-56C4B2461849}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{511EE213-9EAD-43F2-98C8-56C4B2461849}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{511EE213-9EAD-43F2-98C8-56C4B2461849}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{511EE213-9EAD-43F2-98C8-56C4B2461849}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22BFA538-3C6C-48C9-8292-219E50318272}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22BFA538-3C6C-48C9-8292-219E50318272}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22BFA538-3C6C-48C9-8292-219E50318272}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22BFA538-3C6C-48C9-8292-219E50318272}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B540ED67-4833-40EA-9B66-C73FB230F4AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B540ED67-4833-40EA-9B66-C73FB230F4AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B540ED67-4833-40EA-9B66-C73FB230F4AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B540ED67-4833-40EA-9B66-C73FB230F4AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AB23423-B3BD-408A-B4AB-600AEEDA7F0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AB23423-B3BD-408A-B4AB-600AEEDA7F0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AB23423-B3BD-408A-B4AB-600AEEDA7F0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AB23423-B3BD-408A-B4AB-600AEEDA7F0A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B540ED67-4833-40EA-9B66-C73FB230F4AB} = {B6791AEF-456D-40A8-BAD3-5A6D0694A34B}
+	EndGlobalSection
+EndGlobal

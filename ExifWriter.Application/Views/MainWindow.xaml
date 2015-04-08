@@ -1,0 +1,52 @@
+﻿<Window x:Class="ExifWriter.Application.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Exif Writer" Height="650" Width="1050">
+    <Grid>
+        <Menu HorizontalAlignment="Stretch" Height="25" VerticalAlignment="Top">
+            <MenuItem Height="25" Width="Auto" Header="File">
+                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Open Sequenz" Command="{Binding OpenSequenzCommand}"/>
+                <MenuItem Header="Save" Command="{Binding SaveCommand}"/>
+                <Separator />
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+            <MenuItem Height="25" Width="Auto" Header="Configuration">
+                <MenuItem Header="Backup Originals" IsCheckable="True" IsChecked="{Binding BackupOriginals}"/>
+            </MenuItem>
+        </Menu>
+        <DataGrid HorizontalAlignment="Stretch" Margin="239,30,10,10" VerticalAlignment="Stretch" ItemsSource="{Binding ImageExifDataList}" SelectedItem="{Binding SelectedImage}" 
+                  ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Exposure Time (sec)" Binding="{Binding ExposureTime, Mode=TwoWay}"/>
+                <DataGridTextColumn Header="Aperture" Binding="{Binding Aperture, Mode=TwoWay}" IsReadOnly="False"/>
+                <DataGridTextColumn Header="Focal Length (mm)" Binding="{Binding FocalLength, Mode=TwoWay}" IsReadOnly="False"/>
+                <DataGridTextColumn Header="ISO" Binding="{Binding Iso, Mode=TwoWay}" IsReadOnly="False"/>
+                <DataGridTextColumn Header="Copyright" Binding="{Binding Copyright, Mode=TwoWay}" IsReadOnly="False"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <GroupBox Header="Sync Properties" HorizontalAlignment="Left" Margin="10,161,0,0" VerticalAlignment="Top" Height="155" Width="208">
+            <StackPanel Orientation="Vertical">
+                <CheckBox Content="Exposure Time" IsChecked="{Binding ExposureTimeSyncable}" HorizontalAlignment="Left" Margin="10,10,-2,0" VerticalAlignment="Top" Width="204"/>
+                <CheckBox Content="Aperture" IsChecked="{Binding ApertureSyncable}" HorizontalAlignment="Left" Margin="10,10,-2,0" VerticalAlignment="Top" Width="204"/>
+                <CheckBox Content="Focal Length" IsChecked="{Binding FocalLengthSyncable}" HorizontalAlignment="Left" Margin="10,10,-2,0" VerticalAlignment="Top" Width="204"/>
+                <CheckBox Content="ISO" IsChecked="{Binding IsoSyncable}" HorizontalAlignment="Left" Margin="10,10,-2,0" VerticalAlignment="Top" Width="204"/>
+                <CheckBox Content="Copyright" IsChecked="{Binding CopyrightSyncable}" HorizontalAlignment="Left" Margin="10,10,-2,0" VerticalAlignment="Top" Width="204"/>
+            </StackPanel>
+        </GroupBox>
+        <Button HorizontalAlignment="Left" Margin="10,321,0,0" VerticalAlignment="Top" Width="208" Height="35" Command="{Binding SyncCommand}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../Resources/Icons/recycle.png"/>
+                <TextBlock Text="Sync Properties" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
+        <Button HorizontalAlignment="Left" Margin="10,361,0,0" VerticalAlignment="Top" Width="208" Height="35" Command="{Binding SaveCommand}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="../Resources/Icons/disk_blue.png"/>
+                <TextBlock Text="Save" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+            </StackPanel>
+        </Button>
+        <Image HorizontalAlignment="Left" Height="117" Margin="10,30,0,0" VerticalAlignment="Top" Width="208" Source="{Binding BitmapPreview}"/>
+    </Grid>
+</Window>
