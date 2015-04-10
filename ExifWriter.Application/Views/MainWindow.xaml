@@ -15,7 +15,7 @@
                 <MenuItem Header="Backup Originals" IsCheckable="True" IsChecked="{Binding BackupOriginals}"/>
             </MenuItem>
         </Menu>
-        <DataGrid HorizontalAlignment="Stretch" Margin="239,30,10,10" VerticalAlignment="Stretch" ItemsSource="{Binding ImageExifDataList}" SelectedItem="{Binding SelectedImage}" 
+        <DataGrid HorizontalAlignment="Stretch" Margin="239,87,10,10" VerticalAlignment="Stretch" ItemsSource="{Binding ImageExifDataList}" SelectedItem="{Binding SelectedImage}" 
                   ColumnWidth="*" AutoGenerateColumns="False" CanUserAddRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Filename" Binding="{Binding Filename}" IsReadOnly="True"/>
@@ -48,5 +48,7 @@
             </StackPanel>
         </Button>
         <Image HorizontalAlignment="Left" Height="117" Margin="10,30,0,0" VerticalAlignment="Top" Width="208" Source="{Binding BitmapPreview}"/>
+        <ProgressBar HorizontalAlignment="Stretch" Height="22" Margin="239,51,10,0" VerticalAlignment="Top" Value="{Binding ProgressState}" Maximum="100"/>
+        <Label Content="{Binding ProgressLabel}" HorizontalAlignment="Left" Margin="239,25,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.386,0.013"/>
     </Grid>
 </Window>

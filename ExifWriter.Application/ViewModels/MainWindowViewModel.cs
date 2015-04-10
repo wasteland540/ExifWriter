@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Windows;
@@ -16,6 +17,10 @@ namespace ExifWriter.Application.ViewModels
     public class MainWindowViewModel : ViewModelBase
     {
         private const string PlaceholderPath = "Resources/Placeholders/preview.png";
+        private const string PlaceholderProgressLabel = "Nothing to do...";
+        private const string LoadingProgressLabel = "Loading files...";
+        private const string SynchronizeProgressLabel = "Synchronize files...";
+        private const string SavingProgressLabel = "Saving files...";
         private readonly IExifService _exifService;
 
         private bool _apertureSyncable = Settings.Default.ApertureSyncable;
@@ -30,6 +35,8 @@ namespace ExifWriter.Application.ViewModels
 
         private ICommand _openCommand;
         private ICommand _openSequenzCommand;
+        private string _progressLabel = PlaceholderProgressLabel;
+        private int _progressState;
         private ICommand _saveCommand;
 
         private ImageExifData _selectedImage;
@@ -232,6 +239,34 @@ namespace ExifWriter.Application.ViewModels
             }
         }
 
+        public string ProgressLabel
+        {
+            get { return _progressLabel; }
+            set
+            {
+                if (value != null && value != _progressLabel)
+                {
+                    _progressLabel = value;
+
+                    RaisePropertyChanged("ProgressLabel");
+                }
+            }
+        }
+
+        public int ProgressState
+        {
+            get { return _progressState; }
+            set
+            {
+                if (value != _progressState)
+                {
+                    _progressState = value;
+
+                    RaisePropertyChanged("ProgressState");
+                }
+            }
+        }
+
         #endregion Properties
 
         #region private methods
@@ -249,14 +284,13 @@ namespace ExifWriter.Application.ViewModels
 
             if (dialogResult != null && dialogResult.Value)
             {
-                var imageList = new List<ImageExifData>();
+                ProgressLabel = LoadingProgressLabel;
 
-                foreach (string fileName in openFileDialog.FileNames)
-                {
-                    AddFile(fileName, imageList);
-                }
+                var backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
+                backgroundWorker.DoWork += backgroundWorker_Open;
+                backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
 
-                ImageExifDataList = imageList;
+                backgroundWorker.RunWorkerAsync(openFileDialog.FileNames);
             }
         }
 
@@ -273,22 +307,13 @@ namespace ExifWriter.Application.ViewModels
 
             if (dialogResult != null && dialogResult.Value)
             {
-                var imageList = new List<ImageExifData>();
+                ProgressLabel = LoadingProgressLabel;
 
-                string directory = Path.GetDirectoryName(openFileDialog.FileName);
+                var backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
+                backgroundWorker.DoWork += backgroundWorker_OpenSequenz;
+                backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
 
-                if (directory != null)
-                {
-                    string extension = Path.GetExtension(openFileDialog.FileName);
-                    string[] files = Directory.GetFiles(directory, "*" + extension, SearchOption.TopDirectoryOnly);
-
-                    foreach (string fileName in files)
-                    {
-                        AddFile(fileName, imageList);
-                    }
-                }
-
-                ImageExifDataList = imageList;
+                backgroundWorker.RunWorkerAsync(openFileDialog.FileName);
             }
         }
 
@@ -302,21 +327,19 @@ namespace ExifWriter.Application.ViewModels
 
         private void Save(object obj)
         {
-            new Thread(() =>
+            if (_imageExifDataList.Count > 0)
             {
-                BackupFilesIfConfigured();
+                ProgressLabel = SavingProgressLabel;
 
-                foreach (ImageExifData exifData in _imageExifDataList)
-                {
-                    _exifService.WriteAllExif(exifData.Filename, exifData.ExposureTime, exifData.Aperture,
-                        exifData.FocalLength, exifData.Iso, exifData.Copyright);
-                }
+                var backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
+                backgroundWorker.DoWork += backgroundWorker_Save;
+                backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
 
-                MessageBox.Show("All data saved!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-            }).Start();
+                backgroundWorker.RunWorkerAsync();
+            }
         }
 
-        private void BackupFilesIfConfigured()
+        private int BackupFilesIfConfigured(object sender, int progress, int progressStep)
         {
             if (_backupOriginals)
             {
@@ -339,14 +362,168 @@ namespace ExifWriter.Application.ViewModels
                             {
                                 fileInfo.CopyTo(Path.Combine(backupDirName, filename));
                             }
+
+                            progress = UpdateProgressBar(sender, progress, progressStep);
                         }
                     }
                 }
             }
+
+            return progress;
         }
 
         private void SyncProperties(object obj)
         {
+            if (_selectedImage != null && _imageExifDataList.Count > 0)
+            {
+                ProgressLabel = SynchronizeProgressLabel;
+
+                var backgroundWorker = new BackgroundWorker {WorkerReportsProgress = true};
+                backgroundWorker.DoWork += backgroundWorker_Sync;
+                backgroundWorker.ProgressChanged += backgroundWorker_ProgressChanged;
+
+                backgroundWorker.RunWorkerAsync();
+            }
+        }
+
+        private void Exit(object obj)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
+
+        private void LoadBitmapPreview(string value)
+        {
+            using (var stream = new FileStream(value, FileMode.Open, FileAccess.Read))
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.StreamSource = stream;
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+                bitmap.Freeze();
+
+                BitmapPreview = bitmap;
+            }
+        }
+
+        #endregion private methods
+
+        #region backgroundworker
+
+        private void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            ProgressState = e.ProgressPercentage;
+        }
+
+        private static int UpdateProgressBar(object sender, int progress, int progressStep)
+        {
+            progress += progressStep;
+
+            var backgroundWorker = sender as BackgroundWorker;
+
+            if (backgroundWorker != null)
+            {
+                backgroundWorker.ReportProgress(progress);
+            }
+
+            return progress;
+        }
+
+        private void backgroundWorker_OpenSequenz(object sender, DoWorkEventArgs e)
+        {
+            var filenName = (string) e.Argument;
+            var imageList = new List<ImageExifData>();
+
+            string directory = Path.GetDirectoryName(filenName);
+
+            if (directory != null)
+            {
+                string extension = Path.GetExtension(filenName);
+                string[] files = Directory.GetFiles(directory, "*" + extension, SearchOption.TopDirectoryOnly);
+
+                #region progressBar update
+
+                int progressStep = 100/files.Length;
+                int progress = 0;
+
+                #endregion progressBar update
+
+                foreach (string fileName in files)
+                {
+                    AddFile(fileName, imageList);
+
+                    progress = UpdateProgressBar(sender, progress, progressStep);
+                }
+            }
+
+            ImageExifDataList = imageList;
+            ProgressLabel = PlaceholderProgressLabel;
+            ProgressState = 0;
+        }
+
+        private void backgroundWorker_Open(object sender, DoWorkEventArgs e)
+        {
+            var filenNames = (string[]) e.Argument;
+            var imageList = new List<ImageExifData>();
+
+            #region progressBar update
+
+            int progressStep = 100/filenNames.Length;
+            int progress = 0;
+
+            #endregion progressBar update
+
+            foreach (string fileName in filenNames)
+            {
+                AddFile(fileName, imageList);
+
+                progress = UpdateProgressBar(sender, progress, progressStep);
+            }
+
+            ImageExifDataList = imageList;
+            ProgressLabel = PlaceholderProgressLabel;
+            ProgressState = 0;
+        }
+
+        private void backgroundWorker_Save(object sender, DoWorkEventArgs e)
+        {
+            #region progressBar update
+
+            int progressStep;
+
+            if (_backupOriginals)
+                progressStep = 100/(_imageExifDataList.Count*2);
+            else
+                progressStep = 100/_imageExifDataList.Count;
+
+            int progress = 0;
+
+            #endregion progressBar update
+
+            progress = BackupFilesIfConfigured(sender, progress, progressStep);
+
+            foreach (ImageExifData exifData in _imageExifDataList)
+            {
+                _exifService.WriteAllExif(exifData.Filename, exifData.ExposureTime, exifData.Aperture,
+                    exifData.FocalLength, exifData.Iso, exifData.Copyright);
+
+                progress = UpdateProgressBar(sender, progress, progressStep);
+            }
+
+            MessageBox.Show("All data saved!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            ProgressLabel = PlaceholderProgressLabel;
+            ProgressState = 0;
+        }
+
+        private void backgroundWorker_Sync(object sender, DoWorkEventArgs e)
+        {
+            #region progressBar update
+
+            int progressStep = 100/_imageExifDataList.Count;
+            int progress = 0;
+
+            #endregion progressBar update
+
             foreach (ImageExifData exifData in _imageExifDataList)
             {
                 if (_selectedImage != null)
@@ -381,31 +558,15 @@ namespace ExifWriter.Application.ViewModels
                         exifData.RaisePropertyChanged("Iso");
                     }
                 }
+
+                progress = UpdateProgressBar(sender, progress, progressStep);
             }
 
             MessageBox.Show("All data synchronized!", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            ProgressLabel = PlaceholderProgressLabel;
+            ProgressState = 0;
         }
 
-        private void Exit(object obj)
-        {
-            System.Windows.Application.Current.Shutdown();
-        }
-
-        private void LoadBitmapPreview(string value)
-        {
-            using (var stream = new FileStream(value, FileMode.Open, FileAccess.Read))
-            {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.StreamSource = stream;
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-                bitmap.Freeze();
-
-                BitmapPreview = bitmap;
-            }
-        }
-
-        #endregion private methods
+        #endregion backgroundworker
     }
 }
