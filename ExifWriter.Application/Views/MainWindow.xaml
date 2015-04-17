@@ -1,7 +1,7 @@
 ﻿<Window x:Class="ExifWriter.Application.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Exif Writer" Height="650" Width="1050">
+        Title="Exif Writer" Height="650" Width="1050" Icon="/ExifWriter;component/pokeball.ico">
     <Grid>
         <Menu HorizontalAlignment="Stretch" Height="25" VerticalAlignment="Top">
             <MenuItem Height="25" Width="Auto" Header="File">

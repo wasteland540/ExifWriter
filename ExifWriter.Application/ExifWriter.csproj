@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>pokeball.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ExifLibrary">
       <HintPath>..\..\..\..\..\..\..\#documents2\#C#Libs\ExifLibrary.dll</HintPath>
@@ -145,6 +148,7 @@
     <Resource Include="Resources\Icons\disk_blue.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="pokeball.ico" />
     <Content Include="Resources\Placeholders\preview.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
