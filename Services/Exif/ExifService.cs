@@ -15,6 +15,8 @@ namespace Services.Exif
         private const string FNumberTagParam = " -exif:FNumber";
         private const string CopyrightTagParam = " -exif:Copyright";
 
+        private static readonly Process ExifToolProcess = new Process();
+
         public void WriteAllExif(string filename, string exposuretime = null, float aperture = 0.0f,
             float focalLength = 0.0f,
             int iso = -1,
@@ -28,7 +30,8 @@ namespace Services.Exif
             SetIso(iso, exiftoolProcess);
             SetCopyright(copyright, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public void WriteExposureTimeExif(string filename, string exposuretime)
@@ -37,7 +40,8 @@ namespace Services.Exif
 
             SetExposureTime(exposuretime, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public void WriteApertureExif(string filename, float aperture)
@@ -46,7 +50,8 @@ namespace Services.Exif
 
             SetAperture(aperture, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public void WriteFocalLengthExif(string filename, float focalLength)
@@ -55,7 +60,8 @@ namespace Services.Exif
 
             SetFocalLength(focalLength, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public void WriteIsoExif(string filename, int iso)
@@ -64,7 +70,8 @@ namespace Services.Exif
 
             SetIso(iso, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public void WriteCopyrightExif(string filename, string copyright)
@@ -73,7 +80,8 @@ namespace Services.Exif
 
             SetCopyright(copyright, exiftoolProcess);
 
-            StartProcess(filename, exiftoolProcess);
+            Process process = StartProcess(filename, exiftoolProcess);
+            process.WaitForExit();
         }
 
         public ImageExifData ReadImageExifData(string filename)
@@ -195,10 +203,10 @@ namespace Services.Exif
             exiftoolProcess.Arguments += " -overwrite_original_in_place";
             exiftoolProcess.Arguments += " \"" + filename + "\"";
 
-            var process = new Process {StartInfo = exiftoolProcess};
-            process.Start();
+            ExifToolProcess.StartInfo = exiftoolProcess;
+            ExifToolProcess.Start();
 
-            return process;
+            return ExifToolProcess;
         }
 
         private static void SetCopyright(string copyright, ProcessStartInfo exiftoolProcess)
